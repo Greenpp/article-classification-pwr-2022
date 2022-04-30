@@ -9,7 +9,7 @@ class TrainingConfig:
     classes = 11
     epochs = 10
     learning_rate = 1e-5
-    encoding_dim = 128
+    encoding_dim = 64
     aggregation_dim = 64
 
     project_name = "article-classification-pwr-2022"
