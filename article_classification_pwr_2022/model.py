@@ -67,7 +67,6 @@ class ArxivModel(pl.LightningModule):
         loss = F.cross_entropy(y_hat, y)
         metrics = self.train_metrics(y_hat, y)
 
-        self.log_dict({"loss": loss}, on_step=True, on_epoch=False, prog_bar=True)
         self.log_dict(metrics, on_step=True, on_epoch=False, prog_bar=False)
 
         return loss
