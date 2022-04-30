@@ -36,7 +36,6 @@ class ArxivModel(pl.LightningModule):
                 torchmetrics.Precision(num_classes=classes),
                 torchmetrics.Recall(num_classes=classes),
                 torchmetrics.F1Score(num_classes=classes),
-                torchmetrics.ConfusionMatrix(num_classes=classes),
             ]
         )
         self.train_metrics = metrics.clone("train_")
@@ -68,7 +67,6 @@ class ArxivModel(pl.LightningModule):
 
         loss = F.cross_entropy(y_hat, y)
         metrics = self.train_metrics(y_hat, y)
-        metrics.pop("train_ConfusionMatrix")
 
         self.log_dict({"loss": loss}, on_step=True, on_epoch=False, prog_bar=True)
         self.log_dict(metrics, on_step=True, on_epoch=False, prog_bar=False)
@@ -81,7 +79,6 @@ class ArxivModel(pl.LightningModule):
 
         loss = F.cross_entropy(y_hat, y)
         metrics = self.val_metrics(y_hat, y)
-        metrics.pop("val_ConfusionMatrix")
 
         self.log_dict({"val_loss": loss}, on_step=False, on_epoch=True, prog_bar=True)
         self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=True)
@@ -117,7 +114,6 @@ class ArxivModel(pl.LightningModule):
 
         loss = F.cross_entropy(y_hat, y)
         metrics = self.test_metrics(y_hat, y)
-        metrics.pop("test_ConfusionMatrix")
 
         self.log_dict({"test_loss": loss}, on_step=False, on_epoch=True, prog_bar=False)
         self.log_dict(metrics, on_step=False, on_epoch=True, prog_bar=False)
