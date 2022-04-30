@@ -5,7 +5,7 @@ class TrainingConfig:
     model = "distilbert-base-uncased"
     segment_size = 250
     segment_overlap = 50
-    batch_size = 2
+    batch_size = 4
     classes = 11
     epochs = 10
     learning_rate = 1e-5

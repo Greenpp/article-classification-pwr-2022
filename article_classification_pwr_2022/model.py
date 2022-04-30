@@ -23,6 +23,7 @@ class ArxivModel(pl.LightningModule):
         self.encoder = AutoModelForSequenceClassification.from_pretrained(
             TrainingConfig.model, num_labels=encoding_dim
         )
+        self.encoder.trainable = False
         self.aggregator = nn.GRU(input_size=encoding_dim, hidden_size=aggregation_dim)
         self.classifier = nn.Sequential(
             nn.Linear(aggregation_dim, 32),
@@ -33,8 +34,6 @@ class ArxivModel(pl.LightningModule):
         metrics = torchmetrics.MetricCollection(
             [
                 torchmetrics.Accuracy(num_classes=classes),
-                torchmetrics.Precision(num_classes=classes),
-                torchmetrics.Recall(num_classes=classes),
                 torchmetrics.F1Score(num_classes=classes),
             ]
         )
