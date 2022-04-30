@@ -40,7 +40,7 @@ class ArxivDataset(Dataset):
 
     def _segment_tokens(
         self, token_dict: dict[str, torch.Tensor]
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         input_ids = token_dict["input_ids"][0]
 
         unique_size = self.segment_size - 2 - self.segment_overlap
@@ -64,18 +64,15 @@ class ArxivDataset(Dataset):
         )
         if padding_size:
             reshaped_attention_mask[-1, -padding_size:] = 0
-        reshaped_token_type_ids = torch.zeros(
-            (segments, self.segment_size), dtype=torch.int
-        )
 
-        return reshaped_input_ids, reshaped_attention_mask, reshaped_token_type_ids
+        return reshaped_input_ids, reshaped_attention_mask
 
     def __len__(self) -> int:
         return self.dataset.num_rows
 
     def __getitem__(
         self, idx: int
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, int]:
+    ) -> tuple[torch.Tensor, torch.Tensor, int]:
         txt = self.dataset[idx]["text"]
         tokens = self.tokenizer(txt, return_tensors="pt")
         segment_tokens = self._segment_tokens(tokens)
