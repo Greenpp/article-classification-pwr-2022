@@ -34,3 +34,4 @@ trainer = pl.Trainer(
 # %%
 trainer.fit(model, dm)
 # %%
+# TODO preprocess with bert then train
