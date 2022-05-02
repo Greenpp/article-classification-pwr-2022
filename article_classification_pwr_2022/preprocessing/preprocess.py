@@ -1,4 +1,5 @@
 import pickle as pkl
+from pathlib import Path
 from typing import Iterable
 
 import click
@@ -112,6 +113,7 @@ def main(
     }
 
     print("Saving data...")
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
     save_data(data, output_file)
 
 

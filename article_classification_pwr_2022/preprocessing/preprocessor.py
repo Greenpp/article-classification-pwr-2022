@@ -3,7 +3,10 @@ import logging
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import (
+    AutoModelForSequenceClassification,  # type: ignore
+    AutoTokenizer,  # type: ignore
+)
 
 from ..config import TrainingConfig
 
@@ -26,7 +29,7 @@ class BERTPreprocessor:
 
         self.tokenizer = AutoTokenizer.from_pretrained(TrainingConfig.model)
         self.encoder = AutoModelForSequenceClassification.from_pretrained(
-            TrainingConfig.model, num_labels=encoding_dim
+            TrainingConfig.model, num_labels=encoding_dim  # type: ignore
         )
         self.encoder.trainable = False
         self.encoder.to(self.device)

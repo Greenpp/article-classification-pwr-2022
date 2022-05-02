@@ -9,10 +9,10 @@ class TrainingConfig:
     classes = 11
     epochs = 10
     learning_rate = 1e-5
-    encoding_dim = 64
+    encoding_dim = 128
     aggregation_dim = 64
     processing_batch_size = 256
-    tokenization_batch_size = 10
+    tokenization_batch_size = 1
 
     project_name = "article-classification-pwr-2022"
     run_name = "test-full"
