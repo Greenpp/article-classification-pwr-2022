@@ -6,10 +6,8 @@ import torch.nn.functional as F
 import torchmetrics
 import wandb
 from torch.nn.utils.rnn import pack_sequence
-from transformers import AutoModelForSequenceClassification
 from wandb.plot import confusion_matrix
 
-from .config import TrainingConfig
 from .data.label_translator import LABEL_MAP
 
 
@@ -20,10 +18,6 @@ class ArxivModel(pl.LightningModule):
         super().__init__()
         self.lr = lr
 
-        self.encoder = AutoModelForSequenceClassification.from_pretrained(
-            TrainingConfig.model, num_labels=encoding_dim
-        )
-        self.encoder.trainable = False
         self.aggregator = nn.GRU(input_size=encoding_dim, hidden_size=aggregation_dim)
         self.classifier = nn.Sequential(
             nn.Linear(aggregation_dim, 32),
@@ -42,19 +36,7 @@ class ArxivModel(pl.LightningModule):
         self.test_metrics = metrics.clone("test_")
 
     def forward(self, X) -> torch.Tensor:
-        input_ids, att_mask, lengths = X
-        with torch.no_grad():
-            encoder_out = self.encoder(input_ids, attention_mask=att_mask)
-        encoding = encoder_out.logits
-
-        encodings = []
-        encoding_end = 0
-        for i in range(len(lengths)):
-            encoding_start = encoding_end
-            encoding_end = encoding_start + lengths[i]
-            encodings.append(encoding[encoding_start:encoding_end])
-        packed_encoding = pack_sequence(encodings, enforce_sorted=False)
-
+        packed_encoding = pack_sequence(X, enforce_sorted=False)
         _, hidden = self.aggregator(packed_encoding)
         logits = self.classifier(hidden.squeeze(0))
 

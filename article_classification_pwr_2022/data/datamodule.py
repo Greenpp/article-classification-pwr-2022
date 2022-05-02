@@ -33,7 +33,6 @@ class ArxivDataModule(pl.LightningDataModule):
 
     def prepare_data(self) -> None:
         dataset = load_dataset("ccdv/arxiv-classification")
-        tokenizer = AutoTokenizer.from_pretrained(TrainingConfig.model)
 
         self.train_dataset = ArxivDataset(dataset["train"], tokenizer, self.segment_size, self.segment_overlap)  # type: ignore
         self.val_dataset = ArxivDataset(dataset["validation"], tokenizer, self.segment_size, self.segment_overlap)  # type: ignore
