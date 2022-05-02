@@ -15,7 +15,7 @@ def generate_batches(data, batch_size: int) -> Iterable[dict]:
     if not len(data) % batch_size:
         batches_num += 1
 
-    for i in tqdm(range(batches_num), total=batches_num):
+    for i in tqdm(range(batches_num), total=batches_num, smoothing=0):
         yield data[i * batch_size : (i + 1) * batch_size]
 
 
