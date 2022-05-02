@@ -1,0 +1,8 @@
+vars:
+  - article_classification_pwr_2022/config.py:TrainingConfig
+
+stages:
+  preprocess:
+    cmd: python -m article_classification_pwr_2022.preprocessing.preprocess
+    outs:
+      - ${TrainingConfig.processed_data}

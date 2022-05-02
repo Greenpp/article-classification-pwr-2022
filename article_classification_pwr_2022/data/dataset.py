@@ -4,7 +4,8 @@ from torch.utils.data import Dataset
 
 class ArxivDataset(Dataset):
     def __init__(
-        self, dataset, 
+        self,
+        dataset,
     ) -> None:
         super().__init__()
 
@@ -13,9 +14,7 @@ class ArxivDataset(Dataset):
     def __len__(self) -> int:
         return len(self.dataset)
 
-    def __getitem__(
-        self, idx: int
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
         encodings = self.dataset[idx]["encodings"]
 
         label = self.dataset[idx]["label"]

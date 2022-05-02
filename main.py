@@ -1,6 +1,4 @@
 # %%
-import logging
-
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
 
@@ -8,7 +6,6 @@ from article_classification_pwr_2022.config import RANDOM_SEED, TrainingConfig
 from article_classification_pwr_2022.data.datamodule import ArxivDataModule
 from article_classification_pwr_2022.model import ArxivModel
 
-logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR)
 # %%
 pl.seed_everything(RANDOM_SEED)
 
@@ -16,6 +13,7 @@ dm = ArxivDataModule(
     TrainingConfig.segment_size,
     TrainingConfig.segment_overlap,
     TrainingConfig.batch_size,
+    TrainingConfig.processed_data,
 )
 model = ArxivModel(
     TrainingConfig.learning_rate,
@@ -33,5 +31,3 @@ trainer = pl.Trainer(
 
 # %%
 trainer.fit(model, dm)
-# %%
-# TODO preprocess with bert then train

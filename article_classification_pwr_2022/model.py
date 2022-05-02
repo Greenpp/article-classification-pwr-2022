@@ -4,9 +4,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchmetrics
-import wandb
 from torch.nn.utils.rnn import pack_sequence
 from wandb.plot import confusion_matrix
+
+import wandb
 
 from .data.label_translator import LABEL_MAP
 

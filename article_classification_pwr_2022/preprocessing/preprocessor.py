@@ -1,18 +1,33 @@
+import logging
+
+import numpy as np
 import torch
-from .config import TrainingConfig
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import torch.nn.functional as F
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+from ..config import TrainingConfig
+
+logging.getLogger("transformers.tokenization_utils_base").setLevel(logging.ERROR)
+
 
 class BERTPreprocessor:
-    def __init__(self, segment_size: int, segment_overlap: int, encoding_dim: int, device: str) -> None:
+    def __init__(
+        self,
+        segment_size: int,
+        segment_overlap: int,
+        encoding_dim: int,
+        batch_size: int,
+        device: str,
+    ) -> None:
         self.segment_size = segment_size
         self.segment_overlap = segment_overlap
+        self.batch_size = batch_size
         self.device = device
 
         self.tokenizer = AutoTokenizer.from_pretrained(TrainingConfig.model)
         self.encoder = AutoModelForSequenceClassification.from_pretrained(
             TrainingConfig.model, num_labels=encoding_dim
-            )
+        )
         self.encoder.trainable = False
         self.encoder.to(self.device)
 
@@ -59,11 +74,15 @@ class BERTPreprocessor:
         reshaped_input_ids = self._reshape_tensor(
             input_ids, padding_size, segments, unique_size
         )
-        reshaped_attention_mask = self._reshape_tensor(att_mask, padding_size, segments, unique_size)
+        reshaped_attention_mask = self._reshape_tensor(
+            att_mask, padding_size, segments, unique_size
+        )
 
         return reshaped_input_ids, reshaped_attention_mask
 
-    def _split_batch(self, batch: torch.Tensor, lengths: list[int]) -> list[torch.Tensor]:
+    def _split_batch(
+        self, batch: torch.Tensor, lengths: list[int]
+    ) -> list[torch.Tensor]:
         encodings = []
         encoding_end = 0
         for i in range(len(lengths)):
@@ -73,24 +92,55 @@ class BERTPreprocessor:
 
         return encodings
 
-    def preprocess(self, data: list[dict]) -> list:
-        texts, labels = []
-        for d in data: 
-            texts.append(d['text'])
-            labels.append(d['label'])
-        
+    def _batch_encode(
+        self, segmented_input_ids: torch.Tensor, segmented_att_masks: torch.Tensor
+    ) -> np.ndarray:
+        batches_num = len(segmented_input_ids) // self.batch_size
+        if len(segmented_input_ids) % self.batch_size:
+            batches_num += 1
+
+        encodings = []
+        for i in range(batches_num):
+            batch_start = i * self.batch_size
+            batch_end = batch_start + self.batch_size
+
+            batch_input_ids = segmented_input_ids[batch_start:batch_end]
+            batch_att_masks = segmented_att_masks[batch_start:batch_end]
+
+            encodings.append(
+                self.encoder(
+                    batch_input_ids.to(self.device),
+                    attention_mask=batch_att_masks.to(self.device),
+                )
+                .logits.detach()
+                .cpu()
+                .numpy()
+            )
+
+        return np.concatenate(encodings, axis=0)
+
+    def preprocess(self, data: dict[str, list]) -> list:
+        texts = data["text"]
+        labels = data["label"]
+
         tokens = self.tokenizer(texts, return_tensors="pt", padding=True)
-        input_ids = tokens['input_ids']
-        att_masks = tokens['attention_mask']
+        input_ids = tokens["input_ids"]
+        att_masks = tokens["attention_mask"]
 
         processed_data = []
-        for article_input_ids, attention_mask, label in zip(input_ids, att_masks, labels):
-            # TODO process in batches if not enough memory
-            segmented_input_ids, segmented_att_mask = self._segment_tokens(article_input_ids, attention_mask)
-            encodings =  self.encoder(segmented_input_ids, attention_mask=segmented_att_mask)
-            processed_data.append({
-                'encodings': encodings,
-                'label': label,
-            })
+        for article_input_ids, attention_mask, label in zip(
+            input_ids, att_masks, labels
+        ):
+            segmented_input_ids, segmented_att_mask = self._segment_tokens(
+                article_input_ids, attention_mask
+            )
+            with torch.no_grad():
+                encodings = self._batch_encode(segmented_input_ids, segmented_att_mask)
+            processed_data.append(
+                {
+                    "encodings": encodings,
+                    "label": label,
+                }
+            )
 
         return processed_data
