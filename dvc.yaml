@@ -3,6 +3,14 @@ vars:
 
 stages:
   preprocess:
-    cmd: python -m article_classification_pwr_2022.preprocessing.preprocess
-    outs:
-      - ${TrainingConfig.processed_data}
+    foreach:
+      - dataset: train
+        file: ${TrainingConfig.processed_train}
+      - dataset: val
+        file: ${TrainingConfig.processed_val}
+      - dataset: test
+        file: ${TrainingConfig.processed_test}
+    do:
+      cmd: python -m article_classification_pwr_2022.preprocessing.preprocess --dataset ${item.dataset} --output-file ${item.file}
+      outs:
+        - ${item.file}

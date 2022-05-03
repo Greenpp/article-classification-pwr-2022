@@ -13,7 +13,9 @@ dm = ArxivDataModule(
     TrainingConfig.segment_size,
     TrainingConfig.segment_overlap,
     TrainingConfig.batch_size,
-    TrainingConfig.processed_data,
+    TrainingConfig.processed_train,
+    TrainingConfig.processed_val,
+    TrainingConfig.processed_test,
 )
 model = ArxivModel(
     TrainingConfig.learning_rate,

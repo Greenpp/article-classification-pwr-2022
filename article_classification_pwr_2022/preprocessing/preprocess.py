@@ -12,14 +12,14 @@ from .preprocessor import BERTPreprocessor
 
 def generate_batches(data, batch_size: int) -> Iterable[dict]:
     batches_num = len(data) // batch_size
-    if not len(data) % batch_size:
+    if len(data) % batch_size:
         batches_num += 1
 
     for i in tqdm(range(batches_num), total=batches_num, smoothing=0):
         yield data[i * batch_size : (i + 1) * batch_size]
 
 
-def save_data(data: dict, path: str) -> None:
+def save_data(data: list, path: str) -> None:
     with open(path, "wb") as f:
         pkl.dump(data, f, protocol=pkl.HIGHEST_PROTOCOL)
 
@@ -70,9 +70,14 @@ def process_data(data: list, preprocessor: BERTPreprocessor, batch_size: int) ->
     help="The device to use",
 )
 @click.option(
+    "--dataset",
+    type=click.Choice(["train", "val", "test"]),
+    default="train",
+    help="The dataset to process",
+)
+@click.option(
     "--output_file",
     type=str,
-    default=TrainingConfig.processed_data,
     help="The output file",
 )
 def main(
@@ -82,14 +87,13 @@ def main(
     processing_batch_size: int,
     tokenization_batch_size: int,
     device: str,
+    dataset: str,
     output_file: str,
 ) -> None:
     print(f"Preprocessing with parameters {locals()}")
-    dataset = load_dataset("ccdv/arxiv-classification")
+    data = load_dataset("ccdv/arxiv-classification")
 
-    train_dataset = dataset["train"]  # type: ignore
-    val_dataset = dataset["validation"]  # type: ignore
-    test_dataset = dataset["test"]  # type: ignore
+    raw_dataset = data[dataset]  # type: ignore
 
     preprocessor = BERTPreprocessor(
         segment_size=segment_size,
@@ -99,22 +103,12 @@ def main(
         device=device,
     )
 
-    print("Preprocessing train data...")
-    train_data = process_data(train_dataset, preprocessor, tokenization_batch_size)
-    print("Preprocessing val data...")
-    val_data = process_data(val_dataset, preprocessor, tokenization_batch_size)
-    print("Preprocessing test data...")
-    test_data = process_data(test_dataset, preprocessor, tokenization_batch_size)
-
-    data = {
-        "train": train_data,
-        "validation": val_data,
-        "test": test_data,
-    }
+    print(f"Preprocessing {dataset} data...")
+    processed_dataset = process_data(raw_dataset, preprocessor, tokenization_batch_size)
 
     print("Saving data...")
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
-    save_data(data, output_file)
+    save_data(processed_dataset, output_file)
 
 
 if __name__ == "__main__":

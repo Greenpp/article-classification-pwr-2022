@@ -3,10 +3,7 @@ from torch.utils.data import Dataset
 
 
 class ArxivDataset(Dataset):
-    def __init__(
-        self,
-        dataset,
-    ) -> None:
+    def __init__(self, dataset: list) -> None:
         super().__init__()
 
         self.dataset = dataset

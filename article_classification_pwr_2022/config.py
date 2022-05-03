@@ -16,4 +16,6 @@ class TrainingConfig:
 
     project_name = "article-classification-pwr-2022"
     run_name = "test-full"
-    processed_data = "data/processed_data.pkl"
+    processed_train = "data/processed_train.pkl"
+    processed_val = "data/processed_val.pkl"
+    processed_test = "data/processed_test.pkl"
