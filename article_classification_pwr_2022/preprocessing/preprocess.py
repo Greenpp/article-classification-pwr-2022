@@ -34,31 +34,31 @@ def process_data(data: list, preprocessor: BERTPreprocessor, batch_size: int) ->
 
 @click.command()
 @click.option(
-    "--segment_size",
+    "--segment-size",
     type=int,
     default=TrainingConfig.segment_size,
     help="The size of the segments",
 )
 @click.option(
-    "--segment_overlap",
+    "--segment-overlap",
     type=int,
     default=TrainingConfig.segment_overlap,
     help="The overlap of the segments",
 )
 @click.option(
-    "--encoding_dim",
+    "--encoding-dim",
     type=int,
     default=TrainingConfig.encoding_dim,
     help="The dimension of the encoding",
 )
 @click.option(
-    "--processing_batch_size",
+    "--processing-batch-size",
     type=int,
     default=TrainingConfig.processing_batch_size,
     help="The processing batch size",
 )
 @click.option(
-    "--tokenization_batch_size",
+    "--tokenization-batch-size",
     type=int,
     default=TrainingConfig.tokenization_batch_size,
     help="The tokenization batch size",
@@ -71,12 +71,12 @@ def process_data(data: list, preprocessor: BERTPreprocessor, batch_size: int) ->
 )
 @click.option(
     "--dataset",
-    type=click.Choice(["train", "val", "test"]),
+    type=click.Choice(["train", "validation", "test"]),
     default="train",
     help="The dataset to process",
 )
 @click.option(
-    "--output_file",
+    "--output-file",
     type=str,
     help="The output file",
 )

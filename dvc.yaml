@@ -6,7 +6,7 @@ stages:
     foreach:
       - dataset: train
         file: ${TrainingConfig.processed_train}
-      - dataset: val
+      - dataset: validation
         file: ${TrainingConfig.processed_val}
       - dataset: test
         file: ${TrainingConfig.processed_test}
