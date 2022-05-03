@@ -1,0 +1,23 @@
+schema: '2.0'
+stages:
+  preprocess@1:
+    cmd: python -m article_classification_pwr_2022.preprocessing.preprocess --dataset
+      validation --output-file data/processed_val.pkl
+    outs:
+    - path: data/processed_val.pkl
+      md5: aa3dedf07df4a665e5b6f28a5a14c06e
+      size: 206805182
+  preprocess@0:
+    cmd: python -m article_classification_pwr_2022.preprocessing.preprocess --dataset
+      train --output-file data/processed_train.pkl
+    outs:
+    - path: data/processed_train.pkl
+      md5: cbf4d4a4dabce786941b1081b2fb4b53
+      size: 990204579
+  preprocess@2:
+    cmd: python -m article_classification_pwr_2022.preprocessing.preprocess --dataset
+      test --output-file data/processed_test.pkl
+    outs:
+    - path: data/processed_test.pkl
+      md5: 0381f180889b28165b1cb91c60a26bb1
+      size: 207095896
