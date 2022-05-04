@@ -1,23 +1,9 @@
 import pickle as pkl
 
 import pytorch_lightning as pl
-import torch
 from torch.utils.data import DataLoader
 
 from .dataset import ArxivDataset
-
-
-def custom_collate(batch):
-    input_ids, attention_masks, labels = zip(*batch)
-
-    lengths = [len(x) for x in input_ids]
-
-    return (
-        torch.cat(input_ids, dim=0),
-        torch.cat(attention_masks, dim=0),
-        torch.tensor(lengths),
-        torch.tensor(labels),
-    )
 
 
 class ArxivDataModule(pl.LightningDataModule):
@@ -58,7 +44,6 @@ class ArxivDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.workers,
-            collate_fn=custom_collate,
         )
 
     def val_dataloader(self) -> DataLoader:
@@ -67,7 +52,6 @@ class ArxivDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.workers,
-            collate_fn=custom_collate,
         )
 
     def test_dataloader(self) -> DataLoader:
@@ -76,5 +60,4 @@ class ArxivDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=self.workers,
-            collate_fn=custom_collate,
         )
