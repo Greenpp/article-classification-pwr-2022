@@ -113,7 +113,8 @@ class BERTPreprocessor:
                     batch_input_ids.to(self.device),
                     attention_mask=batch_att_masks.to(self.device),
                 )
-                .logits.detach()
+                .last_hidden_state.mean(dim=1)
+                .detach()
                 .cpu()
                 .numpy()
             )
