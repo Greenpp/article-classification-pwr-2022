@@ -3,10 +3,8 @@ import logging
 import numpy as np
 import torch
 import torch.nn.functional as F
-from transformers import (
-    AutoModelForSequenceClassification,  # type: ignore
-    AutoTokenizer,  # type: ignore
-)
+from transformers import AutoModelForSequenceClassification  # type: ignore
+from transformers import AutoTokenizer  # type: ignore
 
 from ..config import TrainingConfig
 
@@ -18,7 +16,6 @@ class BERTPreprocessor:
         self,
         segment_size: int,
         segment_overlap: int,
-        encoding_dim: int,
         batch_size: int,
         device: str,
     ) -> None:
@@ -28,9 +25,10 @@ class BERTPreprocessor:
         self.device = device
 
         self.tokenizer = AutoTokenizer.from_pretrained(TrainingConfig.model)
-        self.encoder = AutoModelForSequenceClassification.from_pretrained(
-            TrainingConfig.model, num_labels=encoding_dim  # type: ignore
+        BERTencoder = AutoModelForSequenceClassification.from_pretrained(
+            TrainingConfig.model  # type: ignore
         )
+        self.encoder = list(BERTencoder.children())[0]
         self.encoder.trainable = False
         self.encoder.to(self.device)
 

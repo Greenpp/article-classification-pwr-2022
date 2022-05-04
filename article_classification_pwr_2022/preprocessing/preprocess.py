@@ -46,12 +46,6 @@ def process_data(data: list, preprocessor: BERTPreprocessor, batch_size: int) ->
     help="The overlap of the segments",
 )
 @click.option(
-    "--encoding-dim",
-    type=int,
-    default=TrainingConfig.encoding_dim,
-    help="The dimension of the encoding",
-)
-@click.option(
     "--processing-batch-size",
     type=int,
     default=TrainingConfig.processing_batch_size,
@@ -83,7 +77,6 @@ def process_data(data: list, preprocessor: BERTPreprocessor, batch_size: int) ->
 def main(
     segment_size: int,
     segment_overlap: int,
-    encoding_dim: int,
     processing_batch_size: int,
     tokenization_batch_size: int,
     device: str,
@@ -98,7 +91,6 @@ def main(
     preprocessor = BERTPreprocessor(
         segment_size=segment_size,
         segment_overlap=segment_overlap,
-        encoding_dim=encoding_dim,
         batch_size=processing_batch_size,
         device=device,
     )

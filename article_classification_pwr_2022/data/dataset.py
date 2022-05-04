@@ -13,7 +13,6 @@ class ArxivDataset(Dataset):
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
         encodings = self.dataset[idx]["encodings"]
-
         label = self.dataset[idx]["label"]
 
         return encodings, label
